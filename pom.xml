@@ -2,19 +2,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+ 
 
-	<groupId>com.godaddy.sonar</groupId>
-	<artifactId>sonar-ruby-plugin</artifactId>
-	<packaging>sonar-plugin</packaging>
-	<version>1.0.1</version>
+ <parent>
+    <groupId>org.sonarsource.parent</groupId>
+    <artifactId>parent</artifactId>
+    <version>36</version>
+    <relativePath />
+  </parent>
+
+  <artifactId>sonar-ruby-plugin</artifactId>
+  <version>TRUNK-SNAPSHOT</version>
+  <packaging>sonar-plugin</packaging>
+
+
+
+
 
 	<name>Sonar Ruby Plugin</name>
 	<description>Plugin to report ruby code coverage into sonar</description>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sonar.buildVersion>4.5.2</sonar.buildVersion>
-		<jdk.min.version>1.6</jdk.min.version>
+		 <sonar.version>6.4</sonar.version>
+    <sonar-java.version>4.2</sonar-java.version>
+
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
 		<jacoco-maven-version>0.7.4.201502262128</jacoco-maven-version>
 	</properties>
 
@@ -24,25 +36,43 @@
 			<artifactId>snakeyaml</artifactId>
 			<version>1.16</version>
 		</dependency>
+ <dependency>
+      <groupId>org.sonarsource.sonarqube</groupId>
+      <artifactId>sonar-plugin-api</artifactId>
+      <version>${sonar.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonarsource.java</groupId>
+      <artifactId>sonar-java-plugin</artifactId>
+      <version>${sonar-java.version}</version>
+      <type>sonar-plugin</type>
+      <scope>provided</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.codehaus.sonar</groupId>
-			<artifactId>sonar-plugin-api</artifactId>
-			<version>${sonar.buildVersion}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.sonar</groupId>
-			<artifactId>sonar-batch</artifactId>
-			<version>${sonar.buildVersion}</version>
-		</dependency>
-
+    <!-- http://jira.codehaus.org/browse/SONAR-2011
+    We need following dependency, otherwise we will receive compilation error
+    -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.2.0</version>
+      <scope>provided</scope>
+    </dependency>
 		<!-- unit tests -->
-		<dependency>
-			<groupId>org.codehaus.sonar</groupId>
-			<artifactId>sonar-testing-harness</artifactId>
-			<version>${sonar.buildVersion}</version>
-			<scope>test</scope>
-		</dependency>
+		  <dependency>
+      <groupId>org.sonarsource.sonarqube</groupId>
+      <artifactId>sonar-testing-harness</artifactId>
+      <version>${sonar.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonarsource.sonarqube</groupId>
+      <artifactId>sonar-plugin-api</artifactId>
+      <version>${sonar.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -73,204 +103,57 @@
 			<version>2.2.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.12</version>
-		</dependency>
-		<dependency>
+		</dependency> -->
+		 <dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 			<version>1.9</version>
-		</dependency>
-			
+		 
+		</dependency> 
+			 <dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+			<scope>provided</scope>
+		 
+		</dependency> 
+			 
+			 <dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		 
+		</dependency> 
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.sonar</groupId>
-				<artifactId>sonar-packaging-maven-plugin</artifactId>
-				<version>1.7</version>
-				<extensions>true</extensions>
-				<configuration>
-					<pluginClass>com.godaddy.sonar.ruby.RubyPlugin</pluginClass>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
-				<configuration>
-					<source>${jdk.min.version}</source>
-					<target>${jdk.min.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<!-- UTF-8 bundles are not supported by Java, so they must be converted 
-					during build -->
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>native2ascii-maven-plugin</artifactId>
-				<version>1.0-beta-1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>native2ascii</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-version}</version>
-				<configuration>
-					<destfile>${basedir}/target/jacoco.exec</destfile>
-				</configuration>
-				<executions>
-					<execution>
-						<id>jacoco-initialize</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>jacoco-site</id>
-						<phase>package</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18.1</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.surefire</groupId>
-						<artifactId>surefire-junit47</artifactId>
-						<version>2.18.1</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.sonar
-										</groupId>
-										<artifactId>
-											sonar-packaging-maven-plugin
-										</artifactId>
-										<versionRange>[1.3,)</versionRange>
-										<goals>
-											<goal>check-dependencies</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>
-											native2ascii-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0-beta-1,)
-										</versionRange>
-										<goals>
-											<goal>native2ascii</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.6.1</version>
-				<configuration>
-					<charset>UTF-8</charset>
-					<docencoding>UTF-8</docencoding>
-					<links>
-						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://s2tlhydrabuild.test.sdl2.gdg/site/platform/commons/apidocs/</link>
-						<link>http://s2tlhydrabuild.test.sdl2.gdg/site/platform/commons-messaging/apidocs/</link>
-					</links>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.5</version>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<formats>
-						<format>html</format>
-						<format>xml</format>
-					</formats>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.3</version>
-			</plugin>
-			<plugin>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<targetJdk>1.6</targetJdk>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.1.2</version>
-				<configuration>
-					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
+	 
+	  <build>
+    <finalName>${project.artifactId}</finalName>
+    <testResources>
+      <testResource>
+        <directory>${basedir}/src/main/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>${basedir}/src/test/resources</directory>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
+        <artifactId>sonar-packaging-maven-plugin</artifactId>
+        <configuration>
+          <pluginKey>ruby</pluginKey>
+          <pluginName>Ruby</pluginName>
+          <pluginClass>org.sonar.plugins.ruby.RubyPlugin</pluginClass>
+          <pluginDescription><![CDATA[Get code coverage with ruby.]]></pluginDescription>
+          <requirePlugins>java:${sonar-java.version}</requirePlugins>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
