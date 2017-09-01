@@ -43,6 +43,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -55,13 +57,14 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.config.PropertyDefinitions;
 import org.sonar.api.config.Settings;
+//import org.sonar.api.internal.google.common.collect.Lists;
 import org.sonar.api.measures.CoverageMeasuresBuilder;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.resources.Project;
 import org.sonar.api.scan.filesystem.PathResolver;
 import org.sonar.plugins.ruby.RubyPlugin;
 
-import com.google.common.collect.Lists;
+//import com.google.common.collect.Lists;
 
 public class SimpleCovRcovSensor implements Sensor
 {
@@ -110,8 +113,14 @@ public class SimpleCovRcovSensor implements Sensor
     }
     // printReportFile(fileName);
 
-    List<InputFile> sourceFiles = Lists.newArrayList(fs.inputFiles(fs.predicates().hasLanguage("ruby")));
-
+    List<InputFile> sourceFiles = new ArrayList<InputFile>();// Lists.newArrayList(fs.inputFiles(fs.predicates().hasLanguage("ruby")));
+    Iterator<InputFile> iter = fs.inputFiles(fs.predicates().hasLanguage("ruby")).iterator();
+    while (iter.hasNext()) {
+    	sourceFiles.add(iter.next());
+    }
+    
+    
+    
     try
     {
       LOG.info("Calling Calculate Metrics");

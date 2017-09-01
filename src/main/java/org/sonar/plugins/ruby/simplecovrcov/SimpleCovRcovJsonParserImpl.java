@@ -39,30 +39,46 @@ package org.sonar.plugins.ruby.simplecovrcov;
  */
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.measures.CoverageMeasuresBuilder;
-import org.sonar.plugins.ruby.simplecovrcov.SimpleCovRcovJsonParser;
+import org.sonar.api.measures.CoverageMeasuresBuilder; 
 
-import com.google.common.collect.Maps;
+//import com.google.common.collect.Maps;
 
 public class SimpleCovRcovJsonParserImpl implements SimpleCovRcovJsonParser
 {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleCovRcovJsonParserImpl.class);
 
+    public static String readFileToString(File path, String encoding) 
+  		  throws IOException 
+  		{
+  	  return readFileToString(path, Charset.forName(encoding));
+  	  
+  		}
+    public static String readFileToString(File path, Charset encoding) 
+  		  throws IOException 
+  		{
+  		  byte[] encoded = Files.readAllBytes(Paths.get(path.toURI()));
+  		  return new String(encoded, encoding);
+  		}
+    
     public Map<String, CoverageMeasuresBuilder> parse(File file) throws IOException
     {
-        Map<String, CoverageMeasuresBuilder> coveredFiles = Maps.newHashMap();
+        Map<String, CoverageMeasuresBuilder> coveredFiles = new HashMap<String, CoverageMeasuresBuilder>();
 
         File fileToFindCoverage = file;
 
-        String fileString = FileUtils.readFileToString(fileToFindCoverage, "UTF-8");
+        String fileString = readFileToString(fileToFindCoverage, "UTF-8");
 
         JSONObject resultJsonObject = (JSONObject) JSONValue.parse(fileString);
         JSONObject coverageJsonObj = (JSONObject) ((JSONObject) resultJsonObject.get("RSpec")).get("coverage");

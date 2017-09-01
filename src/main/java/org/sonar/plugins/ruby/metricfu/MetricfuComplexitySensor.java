@@ -39,6 +39,8 @@ package org.sonar.plugins.ruby.metricfu;
  */
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -48,6 +50,7 @@ import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.Settings;
+//import org.sonar.api.internal.google.common.collect.Lists;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.PersistenceMode;
 import org.sonar.api.measures.RangeDistributionBuilder;
@@ -55,7 +58,8 @@ import org.sonar.api.resources.Project;
 import org.sonar.api.scan.filesystem.PathResolver;
 import org.sonar.plugins.ruby.RubyPlugin;
 
-import com.google.common.collect.Lists;
+//import com.google.common.collect.*;
+
 
 public class MetricfuComplexitySensor implements Sensor
 {
@@ -99,8 +103,13 @@ public class MetricfuComplexitySensor implements Sensor
       return;
     }
 
-    List<InputFile> sourceFiles = Lists.newArrayList(fs.inputFiles(fs.predicates().hasLanguage("ruby")));
-
+    List<InputFile> sourceFiles =new ArrayList<InputFile>();// Lists.newArrayList(fs.inputFiles(fs.predicates().hasLanguage("ruby")));
+    Iterator<InputFile> iter = fs.inputFiles(fs.predicates().hasLanguage("ruby")).iterator();
+    while (iter.hasNext()) {
+    	sourceFiles.add(iter.next());
+    }
+    
+    
     for (InputFile inputFile : sourceFiles)
     {
       LOG.debug("analyzing functions for classes in the file: " + inputFile.file().getName());

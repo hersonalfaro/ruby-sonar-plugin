@@ -48,9 +48,10 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//import org.sonar.api.internal.google.common.base.Throwables;
 import org.yaml.snakeyaml.Yaml;
 
-import com.google.common.base.Throwables;
+//import com.google.common.base.Throwables;
 
 public class MetricfuComplexityYamlParserImpl implements
     MetricfuComplexityYamlParser {
@@ -96,7 +97,7 @@ public class MetricfuComplexityYamlParserImpl implements
         return new ArrayList<RubyFunction>();
       }
     } catch (Exception e) {
-      LOG.error(Throwables.getStackTraceAsString(e));
+    //  LOG.error(Throwables.getStackTraceAsString(e));
       throw new IOException("Failure parsing YAML results", e);
     }
     

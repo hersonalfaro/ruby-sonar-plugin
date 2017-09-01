@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.plugins.ruby;
+import java.io.Closeable;
 /*
  * SonarQube Ruby Plugin
  * Copyright (C) 2013-2017 SonarSource SA
@@ -38,14 +39,20 @@ package org.sonar.plugins.ruby;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import java.io.File;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+//import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.IOUtils;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FilePredicate;
@@ -53,6 +60,7 @@ import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.Settings;
+//mport org.sonar.api.internal.google.common.collect.Lists;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.resources.Project;
 import org.sonar.plugins.ruby.core.RubyFile;
@@ -62,7 +70,7 @@ import org.sonar.plugins.ruby.parsers.CommentCountParser;
 import org.sonar.squidbridge.measures.Metric;
 import org.sonar.squidbridge.text.Source;
 
-import com.google.common.collect.Lists;
+//import com.google.common.collect.Lists;
 
 public class RubySensor implements Sensor
 {
@@ -85,20 +93,36 @@ public class RubySensor implements Sensor
   {
     computeBaseMetrics(context, project);
   }
-
+  
+  public static String readFileToString(File path, String encoding) 
+		  throws IOException 
+		{
+	  return readFileToString(path, Charset.forName(encoding));
+	  
+		}
+  public static String readFileToString(File path, Charset encoding) 
+		  throws IOException 
+		{
+		  byte[] encoded = Files.readAllBytes(Paths.get(path.toURI()));
+		  return new String(encoded, encoding);
+		}
   protected void computeBaseMetrics(SensorContext sensorContext, Project project)
   {
     Reader reader = null;
     FilePredicate filePredicate = fs.predicates().hasLanguage("ruby");
-    List<InputFile> sourceFiles = Lists.newArrayList(fs.inputFiles(filePredicate));
-
+    List<InputFile> sourceFiles = new ArrayList<>();// Lists.newArrayList(fs.inputFiles(filePredicate));
+ Iterator<InputFile> iter = fs.inputFiles(filePredicate).iterator();
+    while (iter.hasNext()) {
+    	sourceFiles.add(iter.next());
+    }
+    
     Set<RubyPackage> packageList = new HashSet<RubyPackage>();
     for (InputFile rubyFile : sourceFiles)
     {
       try
       {
         File fileRuby = rubyFile.file();
-        reader = new StringReader(FileUtils.readFileToString(fileRuby, fs.encoding().name()));
+        reader = new StringReader(readFileToString(fileRuby, fs.encoding().name()));
         RubyFile resource = new RubyFile(fileRuby, sourceFiles);
         Source source = new Source(reader, new RubyRecognizer());
         packageList.add(new RubyPackage(resource.getParent().getKey()));
@@ -114,15 +138,23 @@ public class RubySensor implements Sensor
         throw new IllegalStateException("Error computing base metrics for project.", e);
       } finally
       {
-        IOUtils.closeQuietly(reader);
+        closeQuietly(reader);
       }
     }
-    for (RubyPackage pack : packageList)
-    {
-      sensorContext.saveMeasure(pack, CoreMetrics.DIRECTORIES, 1.0);
-    }
+//    for (RubyPackage pack : packageList)
+//    {
+//      sensorContext.saveMeasure(pack, CoreMetrics.DIRECTORIES, 1.0);
+//    }
   }
-
+  public static void closeQuietly(Closeable closeable) {
+      try {
+          if (closeable != null) {
+              closeable.close();
+          }
+      } catch (IOException ioe) {
+          // ignore
+      }
+  }
   @Override
   public String toString()
   {

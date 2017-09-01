@@ -2,18 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
- 
 
- <parent>
-    <groupId>org.sonarsource.parent</groupId>
-    <artifactId>parent</artifactId>
-    <version>36</version>
-    <relativePath />
-  </parent>
 
-  <artifactId>sonar-ruby-plugin</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
-  <packaging>sonar-plugin</packaging>
+	<parent>
+		<groupId>org.sonarsource.parent</groupId>
+		<artifactId>parent</artifactId>
+		<version>36</version>
+		<relativePath />
+	</parent>
+
+	<artifactId>sonar-ruby-plugin</artifactId>
+	<version>1.1.6</version>
+	<packaging>sonar-plugin</packaging>
 
 
 
@@ -23,10 +23,10 @@
 	<description>Plugin to report ruby code coverage into sonar</description>
 
 	<properties>
-		 <sonar.version>6.4</sonar.version>
-    <sonar-java.version>4.2</sonar-java.version>
+		<sonar.version>6.4</sonar.version>
+		<sonar-java.version>4.2</sonar-java.version>
 
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+		<maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
 		<jacoco-maven-version>0.7.4.201502262128</jacoco-maven-version>
 	</properties>
 
@@ -36,43 +36,76 @@
 			<artifactId>snakeyaml</artifactId>
 			<version>1.16</version>
 		</dependency>
- <dependency>
-      <groupId>org.sonarsource.sonarqube</groupId>
-      <artifactId>sonar-plugin-api</artifactId>
-      <version>${sonar.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonarsource.java</groupId>
-      <artifactId>sonar-java-plugin</artifactId>
-      <version>${sonar-java.version}</version>
-      <type>sonar-plugin</type>
-      <scope>provided</scope>
-    </dependency>
+		<dependency>
+			<groupId>org.sonarsource.sonarqube</groupId>
+			<artifactId>sonar-plugin-api</artifactId>
+			<version>${sonar.version}</version>
 
-    <!-- http://jira.codehaus.org/browse/SONAR-2011
-    We need following dependency, otherwise we will receive compilation error
-    -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.2.0</version>
-      <scope>provided</scope>
-    </dependency>
+			<scope>provided</scope>
+
+			<exclusions>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.sonarsource.java</groupId>
+			<artifactId>sonar-java-plugin</artifactId>
+			<version>${sonar-java.version}</version>
+			<type>sonar-plugin</type>
+			<scope>provided</scope>
+
+			<exclusions>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- http://jira.codehaus.org/browse/SONAR-2011 We need following dependency, 
+			otherwise we will receive compilation error -->
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-project</artifactId>
+			<version>2.2.0</version>
+			<scope>provided</scope>
+
+			<exclusions>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<!-- unit tests -->
-		  <dependency>
-      <groupId>org.sonarsource.sonarqube</groupId>
-      <artifactId>sonar-testing-harness</artifactId>
-      <version>${sonar.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonarsource.sonarqube</groupId>
-      <artifactId>sonar-plugin-api</artifactId>
-      <version>${sonar.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
+		<dependency>
+			<groupId>org.sonarsource.sonarqube</groupId>
+			<artifactId>sonar-testing-harness</artifactId>
+			<version>${sonar.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.sonarsource.sonarqube</groupId>
+			<artifactId>sonar-plugin-api</artifactId>
+			<version>${sonar.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -103,57 +136,99 @@
 			<version>2.2.1</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.12</version>
-		</dependency> -->
-		 <dependency>
+		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-log4j12</artifactId> 
+			<version>1.7.12</version> </dependency> -->
+		<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 			<version>1.9</version>
-		 
-		</dependency> 
-			 <dependency>
+
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.5</version>
+
+		</dependency>
+		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+			</exclusions>
 			<scope>provided</scope>
-		 
-		</dependency> 
-			 
-			 <dependency>
+
+		</dependency>
+
+		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.5</version>
-			<scope>provided</scope>
-		 
-		</dependency> 
+
+
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.codehaus.sonar.sslr-squid-bridge</groupId>
+			<artifactId>sslr-squid-bridge</artifactId>
+			<version>2.6</version>
+
+			<exclusions>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+
+
 	</dependencies>
 
-	 
-	  <build>
-    <finalName>${project.artifactId}</finalName>
-    <testResources>
-      <testResource>
-        <directory>${basedir}/src/main/resources</directory>
-      </testResource>
-      <testResource>
-        <directory>${basedir}/src/test/resources</directory>
-      </testResource>
-    </testResources>
-    <plugins>
-      <plugin>
-        <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
-        <artifactId>sonar-packaging-maven-plugin</artifactId>
-        <configuration>
-          <pluginKey>ruby</pluginKey>
-          <pluginName>Ruby</pluginName>
-          <pluginClass>org.sonar.plugins.ruby.RubyPlugin</pluginClass>
-          <pluginDescription><![CDATA[Get code coverage with ruby.]]></pluginDescription>
-          <requirePlugins>java:${sonar-java.version}</requirePlugins>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/main/resources</directory>
+			</testResource>
+			<testResource>
+				<directory>${basedir}/src/test/resources</directory>
+			</testResource>
+		</testResources>
+		<plugins>
+
+
+
+			<plugin>
+				<groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
+				<artifactId>sonar-packaging-maven-plugin</artifactId>
+
+				<extensions>true</extensions>
+				<configuration>
+					<pluginKey>ruby</pluginKey>
+					<pluginName>Ruby</pluginName>
+					<pluginClass>org.sonar.plugins.ruby.RubyPlugin</pluginClass>
+					<pluginDescription><![CDATA[Get code coverage with ruby.]]></pluginDescription>
+					<requirePlugins>java:${sonar-java.version}</requirePlugins>
+					<!-- <useChildFirstClassLoader>true</useChildFirstClassLoader> -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
