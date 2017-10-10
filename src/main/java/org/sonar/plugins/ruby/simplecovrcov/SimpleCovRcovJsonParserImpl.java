@@ -43,6 +43,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 //import org.apache.commons.io.FileUtils;
@@ -81,7 +82,35 @@ public class SimpleCovRcovJsonParserImpl implements SimpleCovRcovJsonParser
         String fileString = readFileToString(fileToFindCoverage, "UTF-8");
 
         JSONObject resultJsonObject = (JSONObject) JSONValue.parse(fileString);
-        JSONObject coverageJsonObj = (JSONObject) ((JSONObject) resultJsonObject.get("RSpec")).get("coverage");
+        
+        
+//        Iterator<String> keys = resultJsonObject.keySet().iterator();
+//        // get some_name_i_wont_know in str_Name
+//        String str_Name=keys.next(); 
+//        // get the value i care about
+//        JSONObject centralJsonObj = (JSONObject) ( resultJsonObject.get
+//        
+        
+        JSONObject centralJsonObj = (resultJsonObject.containsKey("RSpec") ?(JSONObject) resultJsonObject.get("RSpec") : null);
+        if(centralJsonObj == null) {
+        	 
+        	centralJsonObj = (resultJsonObject.containsKey("Unit Tests") ?(JSONObject)resultJsonObject.get("Unit Tests") : null);
+            
+        }
+        
+        if(centralJsonObj == null) {
+        	// minitest doesn't comply with "RSpec" or "Unit Tests" labels
+        	 Iterator<String> keys = resultJsonObject.keySet().iterator();
+
+           String firstElement=keys.next(); 
+
+            centralJsonObj = (JSONObject) ( resultJsonObject.get(firstElement));
+        }
+        
+        
+        
+        
+        JSONObject coverageJsonObj = (JSONObject) (centralJsonObj).get("coverage");
 
         // for each file in the coverage report
         for (int j = 0; j < coverageJsonObj.keySet().size(); j++)
