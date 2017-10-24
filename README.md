@@ -7,6 +7,7 @@ The plugin enables analysis of Ruby projects within SonarQube (most recently tes
 <hr>
 
 #The following might be obsolete
+
 Currently the plugin captures basic metrics (Lines of Code, Number of classes and packages, Comment percentage), 
 complexity on each file, and a visual line-by-line code coverage report.
 
