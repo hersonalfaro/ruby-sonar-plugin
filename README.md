@@ -1,7 +1,7 @@
 SonarQube Ruby Plugin
 =================
 ## Historical reference
-I forked it off of [Godaddy branch](https://github.com/GoDaddy-Hosting/ruby-sonar-plugin) and upgraded the code to make it compliant with the newest versions of SonarQube and its API. Currently, functional and integration testing is not available--it needs to be added.
+I forked it off of [Godaddy branch](https://github.com/GoDaddy-Hosting/ruby-sonar-plugin) and upgraded the code to make it compliant with the newest versions of SonarQube and its API. Currently, functional and integration testing is not available--it needs to be added, all of which has been captured [here](https://github.com/hersonalfaro/ruby-sonar-plugin/blob/master/TODO.md)
 
 ## Description / Features
 The plugin enables analysis of Ruby projects within SonarQube (most recently tested against version 6.4 and 6.5 )
